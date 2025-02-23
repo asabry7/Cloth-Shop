@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>search.png</file>
+        <file>../../../AI/hi.png</file>
+    </qresource>
+</RCC>
