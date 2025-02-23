@@ -7,12 +7,12 @@ the following image illustrates the main flow of the application. the main proce
 ## 1- Shop Process
 the smallest process and it periodically prints the content of the store every 8 seconds.
 
-![alt text](image.png)
+![alt text](images/image-4.png)
 
 ## 2- Customer Process
 This is an interactive procecc which will read an input from user ( an integer number ) and based on that value it performs some functionality as illustrated in the following image
 
-![alt text](image-1.png)
+![alt text](images/image-1.png)
  
 
  ## 3- Inventory Manager Process
@@ -41,7 +41,7 @@ shirt,6.00,60
 
 The user interface is created using Qt and QML. You should install Qt 6.8.2 to run the GUI. It is a very simple GUI and will updated with new features in the future.
 
-![alt text](image-2.png)
+![alt text](images/image-2.png)
 
 
-![alt text](image-3.png)
+![alt text](images/image-3.png)
