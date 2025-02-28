@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
+#include <semaphore.h> // For semaphores
+
 
 void ShowAllClothes(Cloth_t *shopClothes) {
     printf("\n====================== Clothing Inventory =====================\n");

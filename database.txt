@@ -1,4 +1,4 @@
-tshirt,5.00,1
-jeans,7000.00,0
-shoes,49.99,3
+tshirt,100.00,300
+jeans,600.00,198
+shoes,49.99,1
 shirt,6.00,60

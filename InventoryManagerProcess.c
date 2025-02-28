@@ -7,21 +7,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>
+#include <semaphore.h> // For semaphores
+
 
 #define SHM_NAME "/cloth_shm"
 #define MAX_CLOTH 100
 
 void handle_restock_signal(int sig, siginfo_t *info, void *context) {
-    if (sig == SIGUSR1) {
-        // Open shared memory
-        int shm_fd = shm_open(SHM_NAME, O_RDWR, 0666);
-        if (shm_fd == -1) {
-            perror("Error opening shared memory");
-            exit(EXIT_FAILURE);
-        }
+    if (sig == SIGRTMIN) {
 
-        // Map shared memory
-        Cloth_t *shared_data = mmap(0, sizeof(Cloth_t) * MAX_CLOTH, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
+        Cloth_t * shared_data = (Cloth_t *) info->si_ptr;
         if (shared_data == MAP_FAILED) {
             perror("Error mapping shared memory");
             exit(EXIT_FAILURE);
@@ -62,11 +57,8 @@ void handle_restock_signal(int sig, siginfo_t *info, void *context) {
         printf("Restocking completed.\n");
 
         // Send confirmation signal back to the sender process
-        sigqueue(info->si_pid, SIGUSR2, (union sigval){0});
+        sigqueue(info->si_pid, SIGRTMAX, (union sigval){0});
 
-        // Cleanup
-        munmap(shared_data, sizeof(Cloth_t) * MAX_CLOTH);
-        close(shm_fd);
     }
 }
 
@@ -75,7 +67,7 @@ void StartInventoryManagerProcess(Cloth_t *shared_data, PidStorage_t *pid_storag
     sa.sa_sigaction = handle_restock_signal;
     sa.sa_flags = SA_SIGINFO;
     sigemptyset(&sa.sa_mask);
-    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGRTMIN, &sa, NULL);
 
     pid_storage->pid3 = getpid();
 

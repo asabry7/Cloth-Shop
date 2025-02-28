@@ -1,9 +1,12 @@
+#define _GNU_SOURCE
 #include "CustomerProcess.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
+#include <semaphore.h> // For semaphores
+
 
 #define BUFFER_SIZE 300
 
@@ -37,7 +40,8 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
     struct sigaction sa;
     sa.sa_handler = handle_confirmation;
     sigemptyset(&sa.sa_mask);
-    sigaction(SIGUSR2, &sa, NULL);
+    sigaction(SIGRTMAX, &sa, NULL);
+    union sigval val;
 
     while (1) {
         printf("\n1. Restock items\n2. Search for a piece\n3. Place an order\n4. Save and Exit\nEnter choice: ");
@@ -45,11 +49,12 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
 
         switch (choice) {
             case 1: {
-                sigqueue(pid_storage->pid3, SIGUSR1, (union sigval){0});
+                val.sival_ptr = shared_data;
+                sigqueue(pid_storage->pid3, SIGRTMIN, val);
 
                 sigset_t mask, oldmask;
                 sigemptyset(&mask);
-                sigaddset(&mask, SIGUSR2);
+                sigaddset(&mask, SIGRTMAX);
                 sigprocmask(SIG_BLOCK, &mask, &oldmask);
 
                 sigsuspend(&oldmask);
