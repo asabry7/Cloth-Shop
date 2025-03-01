@@ -35,13 +35,3 @@ shirt,6.00,60
  gcc *.c -o output
  ./output
  ```
-
-
-# User Interface
-
-The user interface is created using Qt and QML. You should install Qt 6.8.2 to run the GUI. It is a very simple GUI and will updated with new features in the future.
-
-![alt text](images/image-2.png)
-
-
-![alt text](images/image-3.png)
