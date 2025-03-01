@@ -42,6 +42,8 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
     sigemptyset(&sa.sa_mask);
     sigaction(SIGRTMAX, &sa, NULL);
     union sigval val;
+    sem_t *sem = sem_open(SEM_NAME, O_RDWR);
+
 
     while (1) {
         printf("\n1. Restock items\n2. Search for a piece\n3. Place an order\n4. Save and Exit\nEnter choice: ");
@@ -72,6 +74,7 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
                 scanf("%s", searchName);
                 
                 int found = 0;
+                sem_wait(sem);
                 for (int i = 0; i < MAX_CLOTH; i++) {
                     if (strcmp(shared_data[i].name, searchName) == 0) {
                         printf("Found: Name: %s, Price: %.2f, Stock: %d\n", shared_data[i].name, shared_data[i].price, shared_data[i].stock);
@@ -83,6 +86,7 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
                     printf("The product you typed is not available right now\n");
                 }
 
+                sem_post(sem);
                 break;
             } 
 
@@ -94,6 +98,7 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
                 scanf("%s", searchName);
     
                 int found = 0;
+                sem_wait(sem);
                 for (int i = 0; i < MAX_CLOTH; i++) {
                     if (strcmp(shared_data[i].name, searchName) == 0) {
                         printf("Enter the quantity: ");
@@ -112,15 +117,16 @@ void StartCustomerProcess(Cloth_t *shared_data, PidStorage_t *pid_storage) {
                     printf("The product you typed is not available right now\n");
                 }
 
+                sem_post(sem);
                 break;
             }
 
 
 
             case 4:
-                WriteDatabase(shared_data);
                 sigqueue(pid_storage->pid1, SIGINT, (union sigval){0});
                 sigqueue(pid_storage->pid3, SIGINT, (union sigval){0});
+                WriteDatabase(shared_data);
                 return;
         }
     }

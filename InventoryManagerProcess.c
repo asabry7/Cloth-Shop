@@ -16,6 +16,8 @@
 void handle_restock_signal(int sig, siginfo_t *info, void *context) {
     if (sig == SIGRTMIN) {
 
+        sem_t *sem = sem_open(SEM_NAME, O_RDWR);
+
         Cloth_t * shared_data = (Cloth_t *) info->si_ptr;
         if (shared_data == MAP_FAILED) {
             perror("Error mapping shared memory");
@@ -37,6 +39,8 @@ void handle_restock_signal(int sig, siginfo_t *info, void *context) {
 
         // Find the item or an empty slot
         int i = 0;
+
+        sem_wait(sem);
         while (strcmp(shared_data[i].name, "END_OF_DATA") != 0 && i < MAX_CLOTH - 1) {
             if (strcmp(shared_data[i].name, name) == 0) {
                 itemExists = 1;
@@ -54,11 +58,12 @@ void handle_restock_signal(int sig, siginfo_t *info, void *context) {
         shared_data[i].price = price;
         shared_data[i].stock = quantity;
 
+        sem_post(sem);
         printf("Restocking completed.\n");
 
         // Send confirmation signal back to the sender process
         sigqueue(info->si_pid, SIGRTMAX, (union sigval){0});
-
+        sem_close(sem);
     }
 }
 
@@ -70,6 +75,7 @@ void StartInventoryManagerProcess(Cloth_t *shared_data, PidStorage_t *pid_storag
     sigaction(SIGRTMIN, &sa, NULL);
 
     pid_storage->pid3 = getpid();
+
 
     while (1) {
         

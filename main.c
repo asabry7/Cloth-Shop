@@ -6,18 +6,21 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <semaphore.h> // For semaphores
+
+
 #include "ShopProcess.h"
 #include "CustomerProcess.h"
 #include "InventoryManagerProcess.h"
 
-#define SHM_NAME "/cloth_shm"
-#define SHM_PID_NAME "/updater_pid_shm"
 #define MAX_CLOTH 100
 #define BUFFER_SIZE 300
 
 
 int main() {
     int shm_fd, shm_fd_pid;
+    sem_t *sem = sem_open(SEM_NAME, O_CREAT, 0644, 1);
+
     Cloth_t *shared_data;
     PidStorage_t *pid_storage;
 

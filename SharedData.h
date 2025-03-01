@@ -13,6 +13,10 @@
 #define MAX_CLOTH 100
 #define BUFFER_SIZE 300
 
+#define SEM_NAME "/my_semaphore"
+#define SHM_NAME "/cloth_shm"
+#define SHM_PID_NAME "/updater_pid_shm"
+
 typedef struct {
     char name[50];
     float price;
